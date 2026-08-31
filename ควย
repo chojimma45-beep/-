@@ -1,0 +1,255 @@
+-- [[ ชื่อสคริปต์ 56 ]] --
+-- Key: 49
+
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+-- ระบบใส่ Key
+local KeySystem = true
+local CorrectKey = "49"
+
+if KeySystem then
+    local KeyWindow = OrionLib:MakeWindow({
+        Name = "56 - Key System",
+        HidePremium = true,
+        SaveConfig = false,
+        IntroText = "ระบบยืนยัน Key"
+    })
+    
+    local KeyTab = KeyWindow:MakeTab({
+        Name = "Key",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
+    })
+    
+    local EnteredKey = ""
+    KeyTab:AddTextbox({
+        Name = "ใส่ Key ที่นี่ (Enter Key)",
+        Default = "",
+        TextDisappear = false,
+        Callback = function(Value)
+            EnteredKey = Value
+        end
+    })
+    
+    KeyTab:AddButton({
+        Name = "ยืนยัน (Submit)",
+        Callback = function()
+            if EnteredKey == CorrectKey then
+                OrionLib:MakeNotification({
+                    Name = "สำเร็จ!",
+                    Content = "Keyถูกต้อง ยินดีต้อนรับสู่สคริปต์ 56",
+                    Image = "rbxassetid://4483345998",
+                    Time = 3
+                })
+                OrionLib:Destroy()
+                wait(1)
+                LoadMainUI()
+            else
+                OrionLib:MakeNotification({
+                    Name = "ผิดพลาด!",
+                    Content = "Key ไม่ถูกต้อง กรุณาลองใหม่ (Key คือ 49)",
+                    Image = "rbxassetid://4483345998",
+                    Time = 3
+                })
+            end
+        end
+    })
+else
+    LoadMainUI()
+end
+
+function LoadMainUI()
+    local Window = OrionLib:MakeWindow({
+        Name = "สคริปต์ 56 | Version 1.0",
+        HidePremium = true,
+        SaveConfig = true,
+        ConfigFolder = "Script56Config",
+        IntroText = "ยินดีต้อนรับสู่ สคริปต์ 56"
+    })
+
+    -- ตัวแปรสถานะภาษาและฟังก์ชัน
+    local CurrentLang = "TH" -- TH หรือ EN
+    local SpinSpeed = 10
+    local Spinning = false
+    local ESPEnabled = false
+    local ESPColor = Color3.fromRGB(255, 0, 0)
+    
+    -- แท็บหลัก
+    local MainTab = Window:MakeTab({
+        Name = "ฟังก์ชันหลัก (Main)",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
+    })
+
+    local SettingTab = Window:MakeTab({
+        Name = "ตั้งค่า (Settings)",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
+    })
+
+    -- 1. วิ่งเร็ว 100
+    local SpeedToggle = MainTab:AddToggle({
+        Name = "1. วิ่งเร็ว 100 (Speed 100)",
+        Default = false,
+        Callback = function(Value)
+            local char = game.Players.LocalPlayer.Character
+            if char and char:FindFirstChild("Humanoid") then
+                char.Humanoid.WalkSpeed = Value and 100 or 16
+            end
+        end
+    })
+
+    -- 2. กระโดดไม่จำกัด (Inf Jump)
+    local InfJumpEnabled = false
+    MainTab:AddToggle({
+        Name = "2. กระโดดไม่จำกัด (Infinite Jump)",
+        Default = false,
+        Callback = function(Value)
+            InfJumpEnabled = Value
+        end
+    })
+
+    game:GetService("UserInputService").JumpRequest:Connect(function()
+        if InfJumpEnabled then
+            local char = game.Players.LocalPlayer.Character
+            if char and char:FindFirstChildOfClass("Humanoid") then
+                char:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+            end
+        end
+    end)
+
+    -- 3. ลดกระตุก/เพิ่ม FPS (Boost FPS)
+    MainTab:AddButton({
+        Name = "3. ลดกระตุก & เพิ่ม FPS (Boost FPS)",
+        Callback = function()
+            for _, v in pairs(game:GetService("Workspace"):GetDescendants()) do
+                if v:IsA("BasePart") and not v:IsA("MeshPart") then
+                    v.Material = Enum.Material.SmoothPlastic
+                elseif v:IsA("Texture") or v:IsA("Decal") then
+                    v:Destroy()
+                end
+            end
+            OrionLib:MakeNotification({
+                Name = "FPS Boost",
+                Content = "ปรับเพิ่ม FPS เรียบร้อยแล้ว!",
+                Time = 2
+            })
+        end
+    })
+
+    -- 4. มองชื่อและเปลี่ยนสี (ESP Name)
+    MainTab:AddToggle({
+        Name = "4. เปิดมองชื่อ (ESP Name)",
+        Default = false,
+        Callback = function(Value)
+            ESPEnabled = Value
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+                    if Value then
+                        if not player.Character.Head:FindFirstChild("ESP_Name") then
+                            local bg = Instance.new("BillboardGui", player.Character.Head)
+                            bg.Name = "ESP_Name"
+                            bg.Size = UDim2.new(0, 100, 0, 50)
+                            bg.StudsOffset = Vector3.new(0, 2, 0)
+                            bg.AlwaysOnTop = true
+                            
+                            local txt = Instance.new("TextLabel", bg)
+                            txt.Size = UDim2.new(1, 0, 1, 0)
+                            txt.BackgroundTransparency = 1
+                            txt.Text = player.Name
+                            txt.TextColor3 = ESPColor
+                            txt.TextScaled = true
+                        end
+                    else
+                        if player.Character.Head:FindFirstChild("ESP_Name") then
+                            player.Character.Head.ESP_Name:Destroy()
+                        end
+                    end
+                end
+            end
+        end
+    })
+
+    MainTab:AddDropdown({
+        Name = "เลือกสีชื่อ (ESP Color)",
+        Default = "สีแดง",
+        Options = {"สีแดง", "สีน้ำเงิน", "สีขาว"},
+        Callback = function(Value)
+            if Value == "สีแดง" then ESPColor = Color3.fromRGB(255, 0, 0)
+            elseif Value == "สีน้ำเงิน" then ESPColor = Color3.fromRGB(0, 0, 255)
+            elseif Value == "สีขาว" then ESPColor = Color3.fromRGB(255, 255, 255) end
+
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player.Character and player.Character:FindFirstChild("Head") and player.Character.Head:FindFirstChild("ESP_Name") then
+                    player.Character.Head.ESP_Name.TextLabel.TextColor3 = ESPColor
+                end
+            end
+        end
+    })
+
+    -- 5. หมุนตัวเอง 360 องศา + ปรับความเร็ว 1-200
+    MainTab:AddToggle({
+        Name = "5. หมุนตัวเอง 360 องศา (Spin Bot)",
+        Default = false,
+        Callback = function(Value)
+            Spinning = Value
+        end
+    })
+
+    MainTab:AddSlider({
+        Name = "ปรับความเร็วการหมุน (1 - 200)",
+        Min = 1,
+        Max = 200,
+        Default = 10,
+        Color = Color3.fromRGB(255, 255, 255),
+        Increment = 1,
+        ValueName = "Speed",
+        Callback = function(Value)
+            SpinSpeed = Value
+        end
+    })
+
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if Spinning then
+            local char = game.Players.LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(SpinSpeed), 0)
+            end
+        end
+    end)
+
+    -- เมนูตั้งค่าและการเปลี่ยนภาษา
+    SettingTab:AddDropdown({
+        Name = "เปลี่ยนภาษา / Language",
+        Default = "ไทย (TH)",
+        Options = {"ไทย (TH)", "English (EN)"},
+        Callback = function(Value)
+            if Value == "ไทย (TH)" then
+                CurrentLang = "TH"
+                OrionLib:MakeNotification({Name = "ตั้งค่า", Content = "เปลี่ยนภาษาเป็น ภาษาไทย เรียบร้อย", Time = 2})
+            else
+                CurrentLang = "EN"
+                OrionLib:MakeNotification({Name = "Settings", Content = "Language changed to English", Time = 2})
+            end
+        end
+    })
+
+    -- ปุ่ม เปิด/ปิด เมนู UI สะดวก (ปุ่ม UI Toggle บนหน้าจอ)
+    local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+    local ToggleButton = Instance.new("TextButton", ScreenGui)
+    ToggleButton.Size = UDim2.new(0, 100, 0, 40)
+    ToggleButton.Position = UDim2.new(0, 10, 0.5, -20)
+    ToggleButton.Text = "เปิด/ปิด เมนู (56)"
+    ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ToggleButton.Active = true
+    ToggleButton.Draggable = true -- ปุ่มเปิด/ปิด ลากขยับได้
+
+    local UIHidden = false
+    ToggleButton.MouseButton1Click:Connect(function()
+        UIHidden = not UIHidden
+        game:GetService("CoreGui").Orion.Enabled = not UIHidden
+    end)
+
+    OrionLib:Init()
+end
